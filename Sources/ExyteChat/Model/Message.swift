@@ -52,7 +52,6 @@ public struct Message: Identifiable, Hashable, Sendable {
     public var text: String
     public var attachments: [Attachment]
     public var reactions: [Reaction]
-    public var giphyMediaId: String?
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
 
@@ -64,7 +63,6 @@ public struct Message: Identifiable, Hashable, Sendable {
                 createdAt: Date = Date(),
                 text: String = "",
                 attachments: [Attachment] = [],
-                giphyMediaId: String? = nil,
                 reactions: [Reaction] = [],
                 recording: Recording? = nil,
                 replyMessage: ReplyMessage? = nil) {
@@ -75,7 +73,6 @@ public struct Message: Identifiable, Hashable, Sendable {
         self.createdAt = createdAt
         self.text = text
         self.attachments = attachments
-        self.giphyMediaId = giphyMediaId
         self.reactions = reactions
         self.recording = recording
         self.replyMessage = replyMessage
@@ -101,9 +98,7 @@ public struct Message: Identifiable, Hashable, Sendable {
                     return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
                 }
             }
-            
-            let giphyMediaId = draft.giphyMedia?.id
-            
+
             return Message(
                 id: id,
                 user: user,
@@ -111,7 +106,6 @@ public struct Message: Identifiable, Hashable, Sendable {
                 createdAt: draft.createdAt,
                 text: draft.text,
                 attachments: attachments,
-                giphyMediaId: giphyMediaId,
                 recording: draft.recording,
                 replyMessage: draft.replyMessage
             )
@@ -131,7 +125,6 @@ extension Message: Equatable {
         lhs.status == rhs.status &&
         lhs.createdAt == rhs.createdAt &&
         lhs.text == rhs.text &&
-        lhs.giphyMediaId == rhs.giphyMediaId &&
         lhs.attachments == rhs.attachments &&
         lhs.reactions == rhs.reactions &&
         lhs.recording == rhs.recording &&

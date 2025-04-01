@@ -44,7 +44,6 @@
 - Displays your messages with pagination and allows you to create and "send" new messages (sending means calling a closure since user will be the one providing actual API calls)
 - Allows you to pass a custom view builder for messages and input views
 - Has a built-in photo and video library/camera picker for multiple media asset selection
-- Sticker keyboard that integrates with Giphy
 - Can display a fullscreen menu on long press a message cell (automatically shows scroll for big messages)
 - Supports "reply to message" via message menu or through a closure. Remove and edit are **coming soon**
 - This library allows to send the following content in messages in any combination:
@@ -82,7 +81,7 @@ Chat type - determines the order of messages and direction of new message animat
 
 Reply mode - determines how replying to message looks. Available options:
 - `quote` - when replying to message A, new message will appear as the newest message, quoting message A in its body  
-- `answer` - when replying to message A, new message with appear directly below message A as a separate cell without duplicating message A in its body  
+- `answer` - when replying to message A, new message with appear direclty below message A as a separate cell without duplicating message A in its body  
 
 To specify any of these pass them through `init`:
 ```swift
@@ -152,7 +151,7 @@ ChatView(messages: viewModel.messages) { draft in
 - `dismissKeyboardClosure` - call this to dismiss keyboard    
 
 ## Custom message menu
-Long tap on a message will display a menu for this message (can be turned off, see Modifiers). To define custom message menu actions declare an enum conforming to `MessageMenuAction`. Then the library will show your custom menu options on long tap on message instead of default ones, if you pass your enum's name to it (see code sample). Once the action is selected special callback will be called. Here is a simple example:
+Long tap on a message will display a menu for this message (can be turned off, see Modifiers). To define custom message menu actions declare an enum conforming to `MessageMenuAction`. Then the library will show your custom menu options on long tap on message instead of default ones, if you pass your enum's name to it (see code sample). Once the action is selected special callbcak will be called. Here is a simple example:
 ```swift
 enum Action: MessageMenuAction {
     case reply, edit
@@ -246,10 +245,9 @@ These use `AnyView`, so please try to keep them easy enough
 ## Modifiers 
 `isListAboveInputView` - messages table above the input field view or not   
 `showDateHeaders` - show section headers with dates between days, default is `true`    
-`isScrollEnabled` - forbid scrolling for messages' `UITableView`   
+`isScrollEnabled` - forbid scrolling for messages' `UITabelView`   
 `showMessageMenuOnLongPress` - turn menu on long tap on/off    
 `showNetworkConnectionProblem` - display network error on/off    
-`keyboardDismissMode` - set keyboard dismiss mode for the chat list (.interactive, .onDrag, or .none), default is .none    
 `assetsPickerLimit` - set a limit for MediaPicker built into the library   
 `setMediaPickerSelectionParameters` - a struct holding MediaPicker selection parameters (assetsPickerLimit and others like mediaType, selectionStyle, etc.).   
 `orientationHandler` - handle screen rotation
@@ -281,17 +279,14 @@ You can use `chatTheme` to customize colors and images of default UI. You can pa
             addButtonBackground: .purple
         ),
         images: .init(
-            background: ChatTheme.Images.Background(
-                portraitBackgroundLight: Image("chatBackgroundLight"),
-                portraitBackgroundDark: Image("chatBackgroundDark"),
-                landscapeBackgroundLight: Image("chatBackgroundLandscapeLight"),
-                landscapeBackgroundDark: Image("chatBackgroundLandscapeDark")
-            )
+          backgroundLight: Image("chatBackgroundLight"),
+          backgroundDark: Image("chatBackgroundDark")
+        )
     )
 )
 
 ```
-By default the built-in MediaPicker will be auto-customized using the most logical colors from chatTheme. But you can always use `mediaPickerTheme` in a similar fashion to set your own colors.      
+By default the built-in MediaPicker will be auto-customized using the mosyt logical colors from chatTheme. But you can always use `mediaPickerTheme` in a similar fashion to set your own colors.      
 
 ### makes sense only for built-in message view    
 `avatarSize` - the default avatar is a circle, you can specify its diameter here   
@@ -309,78 +304,6 @@ By default the built-in MediaPicker will be auto-customized using the most logic
     - `.textAndMedia`   
     - `.textAndAudio`   
     - `.textOnly`    
-  
-<img src="https://raw.githubusercontent.com/exyte/media/master/Chat/pic2.png" width="300">
-
-## Large Attachment Support
-
-The library provides full support for uploading multiple attachments larger than 100 MB and for reporting upload status on both the sender’s and receiver’s message views. It offers flexibility in how much progress tracking functionality the client implements, allowing developers to omit percentage-based updates if desired. Sending percentage updates to the receiver requires careful handling, as it involves multiple WebSocket calls to synchronize status between sender and receiver.
-
-*Option 1*
-
-No status is passed to an Attachment. This is the default behavior and shows no progress indicators. If the full attachment is uploaded to a resource server before the message is sent to the receiver, use this method, as it is the simplest and requires no progress tracking.
-
-```swift
-Attachment(
-  fullUploadStatus: Attachment.UploadStatus? = nil
-)
-```
-
-*Option 2*
-
-A progress indicator is displayed without a percentage. Most chat applications handle multiple large (100 MB+) files, which may take several minutes to upload. In these cases, Option 1 results in a poor user experience because the receiver has no indication that the files are being uploaded. Option 2 allows both the sender and receiver to see a generic progress indicator during the upload.
-
-```swift
-Attachment(
-  fullUploadStatus: Attachment.UploadStatus? = Attachment.UploadStatus.inProgress(nil)
-)
-```
-
-*Option 3*: 
-
-A progress indicator is displayed with a percentage. This option provides the best user experience, as it shows the progress of the upload. However, it adds implementation complexity: both the sender and receiver must remain synchronized through multiple WebSocket updates (e.g., 10%, 20%, …). For production-quality chat applications, implementing this option is recommended.
-
-```swift
-Attachment(
-  fullUploadStatus: Attachment.UploadStatus? = Attachment.UploadStatus.inProgress(0)
-)
-```
-
-When implementing status updates via Option 2/3 the following status updates need to be handled by the client:
-
-```swift
-// When the upload completes, send a final message to stop displaying the progress indicator.
-let completeUpload = Attachment(fullUploadStatus: Attachment.UploadStatus.complete)
-sendToServer(initialProgress)
-
-// If the user cancels an attachment upload, report this to the receiver.
-let cancelUpload = Attachment(fullUploadStatus: Attachment.UploadStatus.cancelled)
-sendToServer(cancelUpload)
-
-// If the upload to the resource server fails, send an error status to the receiver.
-let errorUpload = Attachment(fullUploadStatus: Attachment.UploadStatus.error)
-sendToServer(errorUpload)
-```
-
-## Sticker Keyboard
-
-You can pick and send animated gifs via the integrated sticker keyboard. In order to use this functionality a client id must be granted via the [Giphy Developers](https://developers.giphy.com/) site.
-
-To include the sticker keyboard:
-
-```swift
-.setAvailableInputs([.text, .giphy])
-.giphyConfig(
-    GiphyConfiguration(
-        giphyKey: "client id",
-        mediaTypeConfig: [.recents, .gifs, .stickers, .clips],
-        showAttributionMark: true
-    )
-)
-```
-
-To approve a production client Id for your app, Giphy requires that you include a "Powered By GIPHY" attribution mark, see [attribution mark requirement](https://support.giphy.com/hc/en-us/articles/360035158592-What-conditions-does-my-app-project-need-to-meet-in-order-to-get-a-production-API-Key). Setting the showAttributionMark in the GiphyConfiguration struct will include a small overlay image on the giphy picker which meets the requirement needed for a production client key.
-
 
 ## Localization
 
@@ -395,39 +318,6 @@ The library uses the following text that can be localized:
 - Recording...
 - Reply to
 
-## Image Caching with Cache Keys
-
-The Chat framework uses Kingfisher for efficient image caching. You can provide custom cache keys. By default, the cache key is the URL of the image.
-
-### User Avatar Cache Keys
-
-When creating a `User`, you can specify a custom cache key for the avatar image:
-
-```swift
-let user = User(
-    id: "user123",
-    name: "John Doe",
-    avatarURL: URL(string: "https://example.com/avatar.jpg"),
-    avatarCacheKey: "user_avatar_123", // Custom cache key
-    isCurrentUser: false
-)
-```
-
-### Attachment Cache Keys
-
-For `Attachment` objects, you can specify separate cache keys for thumbnail and full-size images:
-
-```swift
-let attachment = Attachment(
-    id: "attachment456",
-    thumbnail: URL(string: "https://example.com/thumb.jpg"),
-    full: URL(string: "https://example.com/full.jpg"),
-    type: .image,
-    thumbnailCacheKey: "thumb_456", // Cache key for thumbnail
-    fullCacheKey: "full_456"        // Cache key for full image
-)
-```
-
 ## Examples
 There are 2 example projects:    
 - One has a simple bot posting random text/media messages every 2 seconds. It has no back end and no local storage. Every new start is clean and fresh.     
@@ -435,7 +325,7 @@ There are 2 example projects:
 
 Create your firestore app
 https://console.firebase.google.com/
-Create firestore database (for light weight text data)
+Create firesote database (for light weight text data)
 https://firebase.google.com/docs/firestore/manage-data/add-data
 Create cloud firestore database (for images and voice recordings)
 https://firebase.google.com/docs/storage/web/start
@@ -477,5 +367,6 @@ dependencies: [
 [ProgressIndicatorView](https://github.com/exyte/ProgressIndicatorView) - A number of animated progress indicators    
 [FlagAndCountryCode](https://github.com/exyte/FlagAndCountryCode) - Phone codes and flags for every country    
 [SVGView](https://github.com/exyte/SVGView) - SVG parser    
-[LiquidSwipe](https://github.com/exyte/LiquidSwipe) - Liquid navigation animation
+[LiquidSwipe](https://github.com/exyte/LiquidSwipe) - Liquid navigation animation    
+
 
