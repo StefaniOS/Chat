@@ -12,10 +12,6 @@ extension EnvironmentValues {
     @Entry var chatTheme = ChatTheme()
 }
 
-extension EnvironmentValues {
-    @Entry var giphyConfig = GiphyConfiguration()
-}
-
 extension View {
 
     public func chatTheme(_ theme: ChatTheme) -> some View {
@@ -27,10 +23,6 @@ extension View {
         images: ChatTheme.Images = .init()
     ) -> some View {
         self.environment(\.chatTheme, ChatTheme(colors: colors, images: images))
-    }
-
-    public func giphyConfig(_ config: GiphyConfiguration) -> some View {
-        self.environment(\.giphyConfig, config)
     }
 }
 

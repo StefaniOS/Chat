@@ -24,19 +24,11 @@ struct TextInputView: View {
                     .foregroundColor(style == .message ? theme.colors.inputPlaceholderText : theme.colors.inputSignaturePlaceholderText)
             }
             .foregroundColor(style == .message ? theme.colors.inputText : theme.colors.inputSignatureText)
-            .padding(.vertical, 10)
-            .padding(.leading, !isMediaGiphyAvailable() ? 12 : 0)
+            .padding(10)
             .simultaneousGesture(
                 TapGesture().onEnded {
                     globalFocusState.focus = .uuid(inputFieldId)
                 }
             )
-
-    }
-    
-    private func isMediaGiphyAvailable() -> Bool {
-        return availableInputs.contains(AvailableInputType.media)
-        || availableInputs.contains(AvailableInputType.giphy)
     }
 }
-

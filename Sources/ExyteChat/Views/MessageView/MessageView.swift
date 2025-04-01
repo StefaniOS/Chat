@@ -27,7 +27,6 @@ struct MessageView: View {
 
     @State var avatarViewSize: CGSize = .zero
     @State var statusSize: CGSize = .zero
-    @State var giphyAspectRatio: CGFloat = 1
     @State var timeSize: CGSize = .zero
     @State var messageSize: CGSize = .zero
     
@@ -147,10 +146,6 @@ struct MessageView: View {
             
             VStack(alignment: .leading, spacing: 0) {
                 
-                if let giphyMediaId = message.giphyMediaId {
-                    giphyView(giphyMediaId)
-                }
-                
                 if !message.attachments.isEmpty {
                     attachmentsView(message)
                 }
@@ -242,12 +237,6 @@ struct MessageView: View {
             }
         }
         .contentShape(Rectangle())
-    }
-    
-    @ViewBuilder
-    func giphyView(_ giphyMediaId: String) -> some View {
-        GiphyMediaView(id: giphyMediaId, aspectRatio: $giphyAspectRatio)
-            .frame(width: 200 * giphyAspectRatio, height: 200)
     }
 
     @ViewBuilder
