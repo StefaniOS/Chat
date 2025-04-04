@@ -24,7 +24,8 @@ struct TextInputView: View {
                     .foregroundColor(style == .message ? theme.colors.inputPlaceholderText : theme.colors.inputSignaturePlaceholderText)
             }
             .foregroundColor(style == .message ? theme.colors.inputText : theme.colors.inputSignatureText)
-            .padding(10)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
             .simultaneousGesture(
                 TapGesture().onEnded {
                     globalFocusState.focus = .uuid(inputFieldId)

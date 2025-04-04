@@ -100,6 +100,10 @@ struct InputView: View {
     @State private var dragStart: Date?
     @State private var tapDelayTimer: Timer?
     @State private var cancelGesture = false
+
+    private let inputFieldHeight: CGFloat = 24
+    private var inputFieldCornerRadius: CGFloat { 24 }
+    private var rightOutsideButtonHeight: CGFloat { inputFieldHeight }
     private let tapDelay = 0.2
     
     var body: some View {
@@ -112,14 +116,15 @@ struct InputView: View {
                     rightView
                 }
                 .background {
-                    RoundedRectangle(cornerRadius: 18)
+                    RoundedRectangle(cornerRadius: inputFieldCornerRadius)
                         .fill(style == .message ? theme.colors.inputBG : theme.colors.inputSignatureBG)
                 }
                 
                 rightOutsideButton
+                    .frame(height: rightOutsideButtonHeight)
+                    .padding(.bottom, 8)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+            .padding(8)
         }
         .background(backgroundColor)
         .onAppear {
@@ -173,7 +178,7 @@ struct InputView: View {
                 )
             }
         }
-        .frame(minHeight: 48)
+        .frame(minHeight: inputFieldHeight)
     }
     
     @ViewBuilder
@@ -194,7 +199,7 @@ struct InputView: View {
                 Color.clear.frame(width: 8, height: 1)
             }
         }
-        .frame(minHeight: 48)
+        .frame(minHeight: inputFieldHeight)
     }
     
     @ViewBuilder
@@ -226,7 +231,7 @@ struct InputView: View {
     var rightOutsideButton: some View {
         if state == .editing {
             editingButtons
-                .frame(height: 48)
+                .frame(height: rightOutsideButtonHeight)
         }
         else {
             ZStack {
@@ -258,7 +263,7 @@ struct InputView: View {
                     .offset(y: (state == .isRecordingTap ? -28 : -overlaySize.height) - 24)
                 }
             }
-            .viewSize(48)
+            .viewSize(rightOutsideButtonHeight)
         }
     }
     
@@ -355,14 +360,14 @@ struct InputView: View {
             onAction(.send)
         } label: {
             theme.images.inputView.arrowSend
-                .viewSize(48)
+                .viewSize(rightOutsideButtonHeight)
                 .circleBackground(theme.colors.sendButtonBackground)
         }
     }
     
     var recordButton: some View {
         theme.images.inputView.microphone
-            .viewSize(48)
+            .viewSize(rightOutsideButtonHeight)
             .circleBackground(theme.colors.sendButtonBackground)
             .frameGetter($recordButtonFrame)
     }
